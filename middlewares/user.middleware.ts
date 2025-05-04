@@ -1,41 +1,43 @@
-// Practice middlare function
-import {Request , Response , NextFunction} from "express";
 import jwt from "jsonwebtoken";
-import { getJwtToken } from "../controllers/user.controller.ts";
+import { Request , Response , NextFunction } from "express";
+import { generateJwtToken } from "../controllers/user.controller.ts";
 import { ApiError } from "../src/utils/ApiError.ts";
 
- function verifyToken(accessToken:string , secretkey:string ){
-   return new Promise((resolve , reject) => {
-    jwt.verify(accessToken,secretkey,(error , decoded:any) => {
-        if(error){
-          reject({...error , isVerified:false})
-        }else{
-          resolve({...decoded , isVerified:true});
-        }
-    })
- })
- }
+function verifyToken(token:string , secretKey:string){
+  return new Promise((resolve , reject) => {
+   jwt.verify(token , secretKey , function(error , decoded){
+       if(error){
+           reject(error)
+       }else{
+           resolve(decoded);
+       }
+   })
+  })
+}
 
-const verifyJwt = async (req:Request,res:Response,next:NextFunction) => {
-   const {accessToken , refreshToken} = req.cookies;
-    // verify accesstoken
-    const tokenData:any = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
-    console.log(tokenData,"See Data");
-    if(tokenData.isVerified){
-       next();
-    }else{
-        const refreshTokenData:any = await verifyToken(refreshToken , process.env.REFRESH_TOKEN_SECRET_KEY);
-        if(refreshTokenData.isVerified){
-            const accessToken = getJwtToken({fullname:refreshTokenData.fullname , email:refreshTokenData.email} , "1d");
-            res.cookie("accessToken" , accessToken , {
-                httpOnly: true,
-                secure: true,
-                maxAge: 24 * 60 * 60 * 1000
-            });
-            next();
-        }
-        else{
-            res.status(401).json(new ApiError(401 , "Unauthorised acccess"))
-        }
-    }
-} 
+export async function verifyJwToken(req:Request,res:Response,next:NextFunction){
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+
+  if(accessToken && refreshToken){
+  const accessTokenDecodedInfo = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
+  if(accessTokenDecodedInfo){
+    next();
+  }else{
+   const refreshTokenDecodedInfo:any = await verifyToken(refreshToken , process.env.REFRESH_TOKEN_SECRET_KEY);
+   if(refreshTokenDecodedInfo){
+    const accessToken = await generateJwtToken({fullname : refreshTokenDecodedInfo.fullname , email: refreshTokenDecodedInfo.email}, process.env.ACCESS_TOKEN_SECRET_KEY , 1);
+    res.cookie("accessToken" , accessToken , {
+       httpOnly: true ,
+       secure: true ,
+       sameSite: "strict"
+    });
+    next();
+   }else{
+       res.status(401).json(new ApiError(401,"Jwt tokens expired!"))
+   }
+  }
+}else{
+   res.status(401).json(new ApiError(422 , "Must provide Jwt Token"));
+}
+}

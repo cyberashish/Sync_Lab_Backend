@@ -3,6 +3,7 @@ import { userRouter } from "./routes/user.routes.ts";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import cookieParser from 'cookie-parser';
 
 const server = express();
 
@@ -14,7 +15,7 @@ server.use(express.urlencoded({extended:true , limit:"16kb"}));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname =  path.dirname(__filename);
 server.use(express.static(path.join(__dirname , "public")));
-
+server.use(cookieParser());
 
 server.use("/api/v1/user" , userRouter)
 
