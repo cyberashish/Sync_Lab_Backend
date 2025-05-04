@@ -1,24 +1,21 @@
 import express from "express";
 import { userRouter } from "./routes/user.routes.ts";
 import cors from "cors";
-import {fileURLToPath} from "url";
 import path from "path";
-import cookieParser from 'cookie-parser';
+import { fileURLToPath } from "url";
 
-// Resolved paths
-const __filename = fileURLToPath(import.meta.url);
-const __dirname =  path.dirname(__filename);
+const server = express();
 
-export const server = express();
-
-// Middleares
+// Middlewares
 server.use(cors());
 server.use(express.json({limit:"16kb"}));
-server.use(express.urlencoded({limit:'16kb', extended:true}));
-server.use(express.static(path.join(__dirname , "public" )));
-server.use(cookieParser());
+server.use(express.urlencoded({extended:true , limit:"16kb"}));
+// Static middleware
+const __filename = fileURLToPath(import.meta.url);
+const __dirname =  path.dirname(__filename);
+server.use(express.static(path.join(__dirname , "public")));
 
 
-server.use("/api/v1", userRouter)
+server.use("/api/v1/user" , userRouter)
 
-
+export {server};
