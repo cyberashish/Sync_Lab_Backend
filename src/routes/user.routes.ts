@@ -1,15 +1,13 @@
 import express from "express";
-import { login, registerUser } from "../../controllers/user.controller.ts";
+import { LoginUser, LogoutUser, RegisterUser } from "../controllers/user.controller.ts";
+import { verifyJwToken } from "../middlewares/user.middleware.ts";
 
 const userRouter = express.Router();
 
 userRouter
-.get("/" , (req,res) => {
-    res.json({type:"Get/new"})
-})
-.post("/register" , registerUser)
-.post("/login" , login)
-
+.post("/user/register" , RegisterUser)
+.post("/user/login" , LoginUser)
+.post("/user/logout" , verifyJwToken , LogoutUser)
 
 
 export {userRouter}
