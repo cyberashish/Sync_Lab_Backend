@@ -11,7 +11,7 @@ const server = express();
 
 // Middlewares
 server.use(cors({
-    origin: 'http://localhost:5173',  // Frontend URL
+    origin: `${process.env.FRONTEND_HOST}`,  // Frontend URL
     credentials: true,  // Allows the sending of cookies
 }));
 server.use(express.json({limit:"16kb"}));
