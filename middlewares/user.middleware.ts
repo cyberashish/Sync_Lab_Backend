@@ -3,7 +3,7 @@ import { Request , Response , NextFunction } from "express";
 import { generateJwtToken } from "../controllers/user.controller.ts";
 import { ApiError } from "../src/utils/ApiError.ts";
 
-function verifyToken(token:string , secretKey:string){
+export function verifyToken(token:string , secretKey:string){
   return new Promise((resolve , reject) => {
    jwt.verify(token , secretKey , function(error , decoded){
        if(error){
@@ -30,7 +30,6 @@ export async function verifyJwToken(req:Request,res:Response,next:NextFunction){
     res.cookie("accessToken" , accessToken , {
        httpOnly: true ,
        secure: true ,
-       sameSite: "strict"
     });
     next();
    }else{

@@ -14,12 +14,54 @@ datasource db {
 }
 
 model User {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  fullname  String 
-  email     String @unique
-  password  String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  fullname    String 
+  email       String @unique
+  password    String
+  googleId    String?
+  image       String?
+  employee    Employee? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+model Employee {
+    id                   String @id @default(auto()) @map("_id") @db.ObjectId
+    employeeId           String
+    name                 String
+    email                String @unique
+    gender               String
+    mobile_number        String
+    aadhaar_number       String
+    account_number       String
+    department           String
+    designation          String
+    previous_company     String
+    pf_number            String
+    salary               String
+    current_address      String
+    permanent_address    String
+    employeeDOBDate      DateTime
+    employeeJoiningDate  DateTime
+    userId               String @unique
+    employeePassword     String
+    active               Boolean
+    user                 User @relation(fields: [userId] , references: [id] , onDelete: Cascade)
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+model Request {
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId         String
+  name               String
+  designation        String
+  date               DateTime
+  description        String
+  leave              Int
+  requestStatus      String
+  isRequestApproved  Boolean
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 
