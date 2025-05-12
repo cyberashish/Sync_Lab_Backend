@@ -94,7 +94,7 @@ export const LoginUser = async (req:Request,res:Response) => {
                 const refreshToken = await generateJwtToken({fullname:user.fullname , email:user.email} , process.env.REFRESH_TOKEN_SECRET_KEY , 7);
                 res.cookie("accessToken" , accessToken , {
                     httpOnly: true ,
-                    secure: true,
+                    secure: false,
                 });
                 res.cookie('refreshToken' , refreshToken , {
                     httpOnly: true,
