@@ -94,12 +94,12 @@ export const LoginUser = async (req:Request,res:Response) => {
                 const refreshToken = await generateJwtToken({fullname:user.fullname , email:user.email} , process.env.REFRESH_TOKEN_SECRET_KEY , 7);
                 res.cookie("accessToken" , accessToken , {
                     httpOnly: true ,
-                    secure: false,
+                    secure: true,
                     sameSite: 'none'
                 });
                 res.cookie('refreshToken' , refreshToken , {
                     httpOnly: true,
-                    secure:false,     sameSite: 'none'
+                    secure:true,     sameSite: 'none'
                 });
                 res.status(200).json(new ApiResponse(200 , user, "User logged in successfully"))
             }catch(error){
