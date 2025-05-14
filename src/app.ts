@@ -11,7 +11,7 @@ const server = express();
 
 // Middlewares
 server.use(cors({
-    origin: `https://synclabems.netlify.app`,  // Frontend URL
+    origin: `${process.env.FRONTEND_HOST}`,  // Frontend URL
     credentials: true,  // Allows the sending of cookies
 }));
 server.use(express.json({limit:"16kb"}));
