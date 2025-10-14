@@ -37,12 +37,12 @@ export const addEmployee = async (req:Request , res:Response) => {
 
 export const editEmployee = async (req:Request , res:Response) => {
    try{
-    const {email, ...toEditData } = req.body;
+    const {id, ...toEditData } = req.body;
     console.log(toEditData);
-    if(email && toEditData){
+    if(id && toEditData){
       const updatedEmployee = await prisma.employee.update({
         where:{
-          email:email
+          id:id
         },
         data:{...toEditData}
       });

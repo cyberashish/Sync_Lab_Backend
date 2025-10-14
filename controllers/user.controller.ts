@@ -144,12 +144,13 @@ export const getAuthenticatedUser = async (req:Request , res:Response) => {
       const accessToken = req.cookies.accessToken;
       if(accessToken){
         const userData:any = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
-        const user = await prisma.user.findUnique({
-          where:{
-            email:userData.email
-          }
-        })
+        console.log(userData,"ANdruni Baat")
         if(userData){
+          const user = await prisma.user.findUnique({
+            where:{
+              email:userData.email
+            }
+          })
          res.status(200).json(new ApiResponse(200 , {...userData , ...user, role:user.role} , "Successfuly fetched authenticated user"));
         }else{
          res.status(401).json(new ApiError(401 , 'Invalid tokens/unauthorised access'));

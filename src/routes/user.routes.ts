@@ -5,6 +5,8 @@ import { verifyToken } from "../../middlewares/user.middleware.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
 import { ApiError } from "../utils/ApiError.ts";
 import { employeeProfile } from "../../controllers/employee.controller.ts";
+import { prisma } from "../utils/client.ts";
+import jwt from "jsonwebtoken";
 
 const userRouter = express.Router();
 
@@ -22,13 +24,30 @@ userRouter
   
 .get('/api/auth/callback/google', 
     passport.authenticate('google', {session: false, failureRedirect: `${process.env.FRONTEND_HOST}/auth/login` }),
-    (req,res) => {
+   async (req,res) => {
         let userData:any = req.user;
-        res.cookie("accessToken" , userData.accessToken , {
+        console.log("my data" ,req.user,"user" , userData.allInfo)
+      if (!userData.allInfo.email) {
+        return res.redirect(`${process.env.FRONTEND_HOST}/auth/login?error=no_email`);
+      }
+
+const accessToken = jwt.sign(
+    { fullname:userData.allInfo.name , email: userData.allInfo.email },
+    process.env.ACCESS_TOKEN_SECRET_KEY!,
+    { expiresIn: "1d" } 
+  );
+
+  const refreshToken = jwt.sign(
+    { fullname:userData.allInfo.name , email: userData.allInfo.email },
+    process.env.REFRESH_TOKEN_SECRET_KEY!,
+    { expiresIn: "7d" } 
+  );
+
+        res.cookie("accessToken" , accessToken , {
             httpOnly: true,
             secure:false, sameSite:'strict'
         });
-        res.cookie("refreshToken" , userData.refreshToken , {
+        res.cookie("refreshToken" , refreshToken , {
             httpOnly: true,
             secure:false, sameSite:'strict'
         });
