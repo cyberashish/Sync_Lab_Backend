@@ -20,12 +20,13 @@ userRouter
 
 // Social Auth
 .get('/auth/google',
-    passport.authenticate('google', {session: false, scope: ['profile' , 'email'] }))
+    passport.authenticate('google', {session: false, scope: ['profile' , 'email'],prompt: "consent", }))
   
 .get('/api/auth/callback/google', 
     passport.authenticate('google', {session: false, failureRedirect: `${process.env.FRONTEND_HOST}/auth/login` }),
    async (req,res) => {
         let userData:any = req.user;
+        console.log(userData)
       if (!userData.allInfo.email) {
         return res.redirect(`${process.env.FRONTEND_HOST}/auth/login?error=no_email`);
       }
