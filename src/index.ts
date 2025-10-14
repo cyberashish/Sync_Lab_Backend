@@ -2,6 +2,8 @@ import { server } from "./app.ts";
 import { connectDB } from "./utils/client.ts";
 import dotenv from "dotenv";
 
+import "./jobs/resetLeaves.ts";
+
 dotenv.config({path:"./.env"});
 
 connectDB().then(() => {

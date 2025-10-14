@@ -6,6 +6,7 @@ import { ApiResponse } from "../src/utils/ApiResponse.ts";
 import { ApiError } from "../src/utils/ApiError.ts";
 import { verifyToken } from "../middlewares/user.middleware.ts";
 import { generateSimplePassword } from "../src/utils/generatePassword.ts";
+import { sendEmail } from "../src/utils/sendEmail.ts";
 
 
 export  function generateJwtToken(user:{fullname:string , email:string} , secretKey:string , expiry:number){
@@ -142,9 +143,14 @@ export const getAuthenticatedUser = async (req:Request , res:Response) => {
      try{
       const accessToken = req.cookies.accessToken;
       if(accessToken){
-        const userData = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
+        const userData:any = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
+        const user = await prisma.user.findUnique({
+          where:{
+            email:userData.email
+          }
+        })
         if(userData){
-         res.status(200).json(new ApiResponse(200 , userData , "Successfuly fetched authenticated user"));
+         res.status(200).json(new ApiResponse(200 , {...userData , ...user, role:user.role} , "Successfuly fetched authenticated user"));
         }else{
          res.status(401).json(new ApiError(401 , 'Invalid tokens/unauthorised access'));
         }
@@ -154,6 +160,90 @@ export const getAuthenticatedUser = async (req:Request , res:Response) => {
      }catch(error){
         res.status(401).json(new ApiError(401 , error.message))
      }
+}
+
+export const sendResetLink = async (req, res) => {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({
+    where:{
+      email
+    }
+  })
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const token = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET_KEY, {
+    expiresIn: "15m",
+  });
+
+  const link = `${process.env.FRONTEND_HOST}/auth/reset-password/${token}`;
+
+  await sendEmail(
+    user.email,
+    "Password Reset Request",
+    `<p>Click the link below to reset your password:</p>
+     <a href="${link}">${link}</a>
+     <p>This link expires in 15 minutes.</p>`
+  );
+
+  res.json({ message: "Password reset link sent to email." });
+};
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const decoded:any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
+    const user = await prisma.user.findUnique({
+      where:{
+        id:decoded.id
+      }
+    })
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    await prisma.user.update({
+      where:{
+        id: user.id
+      },
+      data:{
+        password: hashedPassword
+      }
+    })
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(400).json({ message: "Invalid or expired token" });
+  }
+};
+
+export const updatePassword = async (req:Request , res:Response) => {
+  const {email , password} = req.body;
+  if(email && password){
+     try{
+       const user = await prisma.user.findUnique({
+        where:{
+          email
+        }
+       });
+       const hashedPassword = bcrypt.hashSync(password , 10);
+       const updatedUser = await prisma.user.update({
+        where:{
+          email
+        },
+        data:{
+          password:hashedPassword
+        }
+       });
+       res.status(200).json(new ApiResponse(200 , updatedUser , "Successfully updated user password!"));
+     }catch(error){
+      res.status(500).json(new ApiResponse(500 , "Internal server error"));
+     }
+  }else{
+    res.status(422).json(new ApiResponse(422 , "All fields are required!"))
+  }
 }
 
 

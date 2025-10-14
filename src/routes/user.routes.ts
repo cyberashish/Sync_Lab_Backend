@@ -1,5 +1,5 @@
 import express from "express";
-import { getAuthenticatedUser, LoginUser, LogoutUser, RegisterUser } from "../../controllers/user.controller.ts";
+import { getAuthenticatedUser, LoginUser, LogoutUser, RegisterUser, resetPassword, sendResetLink, updatePassword } from "../../controllers/user.controller.ts";
 import passport from "passport";
 import { verifyToken } from "../../middlewares/user.middleware.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
@@ -36,6 +36,9 @@ userRouter
     }
     )
 .get('/token/get-user' , getAuthenticatedUser)
+.post("/forgot-password", sendResetLink)
+.post("/reset-password/:token", resetPassword)
+.put("/user/update-password" , updatePassword)
 // .post("/add-employee" , addEmployee)
     
 
