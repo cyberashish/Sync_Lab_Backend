@@ -178,13 +178,17 @@ export const sendResetLink = async (req, res) => {
 
   const link = `${process.env.FRONTEND_HOST}/auth/reset-password/${token}`;
 
-  await sendEmail(
-    user.email,
-    "Password Reset Request",
-    `<p>Click the link below to reset your password:</p>
-     <a href="${link}">${link}</a>
-     <p>This link expires in 15 minutes.</p>`
-  );
+  try{
+    await sendEmail(
+      user.email,
+      "Password Reset Request",
+      `<p>Click the link below to reset your password:</p>
+       <a href="${link}">${link}</a>
+       <p>This link expires in 15 minutes.</p>`
+    );
+  }catch(error){
+    console.error("MAIL ERROR:", error);
+  }
 
   res.json({ message: "Password reset link sent to email." });
 };
