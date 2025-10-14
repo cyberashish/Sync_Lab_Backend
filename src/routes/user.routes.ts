@@ -26,7 +26,6 @@ userRouter
     passport.authenticate('google', {session: false, failureRedirect: `${process.env.FRONTEND_HOST}/auth/login` }),
    async (req,res) => {
         let userData:any = req.user;
-        console.log("my data" ,req.user,"user" , userData.allInfo)
       if (!userData.allInfo.email) {
         return res.redirect(`${process.env.FRONTEND_HOST}/auth/login?error=no_email`);
       }

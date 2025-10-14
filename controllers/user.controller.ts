@@ -142,6 +142,7 @@ export const LogoutUser = async (req:Request , res:Response) => {
 export const getAuthenticatedUser = async (req:Request , res:Response) => {
      try{
       const accessToken = req.cookies.accessToken;
+      console.log(accessToken,"andruni token")
       if(accessToken){
         const userData:any = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
         console.log(userData,"ANdruni Baat")
