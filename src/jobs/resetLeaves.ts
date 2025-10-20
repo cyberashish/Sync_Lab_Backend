@@ -9,7 +9,9 @@ cron.schedule("0 0 1 1 *" , async () => {
         data:{
             totalLeaves:0,
             casualLeaves:0,
-            sickLeaves:0
+            sickLeaves:0,
+            overtimeDays:0,
+            allottedLeaves:18
         }
        });
 

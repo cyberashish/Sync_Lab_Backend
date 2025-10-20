@@ -1,10 +1,10 @@
 import express from "express";
-import { getAuthenticatedUser, LoginUser, LogoutUser, RegisterUser, resetPassword, sendResetLink, updatePassword } from "../../controllers/user.controller.ts";
+import { getAuthenticatedUser, getUserByEmail, LoginUser, LogoutUser, RegisterUser, resetPassword, sendResetLink, updatePassword } from "../../controllers/user.controller.ts";
 import passport from "passport";
 import { verifyToken } from "../../middlewares/user.middleware.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
 import { ApiError } from "../utils/ApiError.ts";
-import { employeeProfile } from "../../controllers/employee.controller.ts";
+import { employeeProfile, getEmployeeByEmail } from "../../controllers/employee.controller.ts";
 import { prisma } from "../utils/client.ts";
 import jwt from "jsonwebtoken";
 
@@ -57,6 +57,7 @@ const accessToken = jwt.sign(
 .get('/token/get-user' , getAuthenticatedUser)
 .post("/forgot-password", sendResetLink)
 .post("/reset-password/:token", resetPassword)
+.post("/get-user/email", getUserByEmail)
 .put("/user/update-password" , updatePassword)
 // .post("/add-employee" , addEmployee)
     

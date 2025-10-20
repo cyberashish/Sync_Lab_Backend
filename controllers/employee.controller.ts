@@ -8,9 +8,9 @@ import { generateEmployeeId } from "../src/utils/generateEmployeeId.ts";
 
 export const addEmployee = async (req:Request , res:Response) => {
   try{
-    const {name , email , gender , mobile_number , aadhaar_number , account_number , department , designation , previous_company , pf_number, salary , active, current_address , permanent_address , employeeDOBDate , employeeJoiningDate} = req.body;
+    const {name , email , gender , mobile_number , aadhaar_number , account_number , department , designation , previous_company , pf_number, salary , active, current_address , permanent_address , employeeDOBDate , employeeJoiningDate , allottedLeaves} = req.body;
 
-    if(name && email && gender && active && mobile_number && aadhaar_number && account_number && department && designation && previous_company && pf_number&& salary && current_address && permanent_address && employeeDOBDate && employeeJoiningDate){
+    if(name && email && gender && active && mobile_number && aadhaar_number && account_number && department && designation && salary && current_address && permanent_address && employeeDOBDate && employeeJoiningDate && allottedLeaves){
       
    const password = generateSimplePassword(name , email);
     const salt = await genSalt(10);
@@ -76,7 +76,7 @@ export const employeeProfile = async (req:Request,res:Response) => {
 
 export const getAllEmployees = async (req:Request , res:Response) => {
   try{
-    const allEmployees = await prisma.employee.findMany();
+    const allEmployees = await prisma.employee.findMany({orderBy:{createdAt:'desc'}});
     res.status(200).json(new ApiResponse(200 , allEmployees , "Successfully fetched all employess!"))
   }catch(error){
     res.status(500).json(new ApiError(500,error.message))
@@ -122,7 +122,7 @@ export const addEmployeesRequest = async (req:Request,res:Response) => {
 
 export const getAllEmployeesRequest = async (req:Request,res:Response) => {
   try{
-     const allRequests = await prisma.request.findMany();
+     const allRequests = await prisma.request.findMany({orderBy:{createdAt:'desc'}});
      res.status(200).json(new ApiResponse(200 , allRequests , "Successfully fetched all requests!"));
   }catch(error){
     console.log(error);
@@ -302,6 +302,9 @@ export const getAllAdminNotifications = async (req:Request , res:Response) => {
     const allNotifications = await prisma.notification.findMany({
       where:{
         userId:admin.id
+      },
+      orderBy:{
+        createdAt:'desc'
       }
     });
     res.status(200).json(new ApiResponse(200 , allNotifications , "Successfully fetched all notifications!"));
@@ -371,10 +374,12 @@ export const getAllEmployeeNotifications = async (req:Request , res:Response) =>
           email:email
         }
       });
-      console.log(user,"My User")
       const allNotifications = await prisma.notification.findMany({
         where:{
           userId:user.id
+        },
+        orderBy:{
+          createdAt:'desc'
         }
       });
       res.status(200).json(new ApiResponse(200 , allNotifications , "Successfully fetched all notifications!"));
@@ -384,5 +389,106 @@ export const getAllEmployeeNotifications = async (req:Request , res:Response) =>
     }
   }else{
     res.status(422).json(new ApiResponse(422 , "All fields are required!"));
+  }
+}
+// Overtime request
+ 
+export const getAllEmployeesOvertimeRequest = async (req:Request,res:Response) => {
+  try{
+     const allRequests = await prisma.overtime.findMany({orderBy:{createdAt: 'desc'}});
+     res.status(200).json(new ApiResponse(200 , allRequests , "Successfully fetched all overtime requests!"));
+  }catch(error){
+    console.log(error);
+    res.status(500).json(new ApiError(500,error.message))
+  }
+}
+
+export const addEmployeesOvertimeRequest = async (req:Request,res:Response) => {
+  try{
+    const {employeeId , name , email, overtimeDates, overtimeDays, designation , description , requestStatus , isRequestApproved} = req.body;
+    if(employeeId && name && designation && description  && email && overtimeDates){
+     const request = await prisma.overtime.create({
+       data:{
+         employeeId , name , designation , date: new Date() , description , requestStatus , isRequestApproved , email, overtimeDates , overtimeDays
+       }
+     });
+     res.status(200).json(new ApiResponse(200 , request , "Successfully created overtime request!"))
+    }else{
+     res.status(422).json(new ApiError(422 , "Please provide all valid fields!"))
+    }
+  }catch(error){
+   res.status(500).json(new ApiError(500,error.message))
+  }
+}
+
+export const updateEmployeeOvertimeRequest = async (req:Request,res:Response) => {
+  try{
+     const {id , ...toUpdateData} = req.body;
+     if(id){
+       try {
+        const updatedRequest = await prisma.overtime.update({
+         where:{
+           id:id
+         },
+         data:{...toUpdateData}
+        });
+        res.status(200).json(new ApiResponse(200 , updatedRequest , "Successfully updated overtime request !"))
+       } catch (error) {
+        res.status(500).json(new ApiError(500,error.message))
+       }
+     }else{
+      res.status(422).json(new ApiError(422 , "Please provide valid requestId!"))
+     }
+  }catch(error){
+    res.status(500).json(new ApiError(500,error.message))
+  }
+}
+
+export const getEmployeeOvertimeRequestInfo = async (req:Request , res:Response) =>{
+  const {email} = req.body;
+  if(email){
+    const employeeRequests = await prisma.employee.findUnique({
+      where:{
+        email
+      },
+      include:{
+        overtimes:{
+          orderBy:{
+            createdAt: 'desc'
+          }
+        }
+      }
+    });
+    console.log(email , employeeRequests)
+    res.status(200).json(new ApiResponse(200 , employeeRequests , "Successfully fetched employee overtime requests!"));
+  }else{
+    res.status(422).json(new ApiError(422 , "Please provide valid fields!"));
+  }
+}
+
+export const updateEmployeeOvertime = async (req:Request , res:Response) => {
+  try{
+    const {email , overtime} = req.body;
+    if(email && overtime){
+      try {
+        const updatedEmployeeOvertime = await prisma.employee.update({
+          where:{
+            email:email
+          },
+          data:{
+            overtimeDays:{increment:overtime},
+          }
+        });
+        res.status(200).json(new ApiResponse(200 , updatedEmployeeOvertime , "Successfully updated employee overtime!"));
+      } catch (error) {
+        console.log(error);
+        res.status(500).json(new ApiError(422, "Failed to update employee!"));
+      }
+    }else{
+      res.status(422).json(new ApiError(422, "Please provide valid details!"));
+    }
+  }catch(error){
+    console.log(error);
+    res.status(500).json(new ApiError(500,error.message));
   }
 }

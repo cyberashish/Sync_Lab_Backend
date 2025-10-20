@@ -145,7 +145,6 @@ export const getAuthenticatedUser = async (req:Request , res:Response) => {
       console.log(accessToken,"andruni token")
       if(accessToken){
         const userData:any = await verifyToken(accessToken , process.env.ACCESS_TOKEN_SECRET_KEY);
-        console.log(userData,"ANdruni Baat")
         if(userData){
           const user = await prisma.user.findUnique({
             where:{
@@ -250,6 +249,24 @@ export const updatePassword = async (req:Request , res:Response) => {
   }else{
     res.status(422).json(new ApiResponse(422 , "All fields are required!"))
   }
+}
+
+export const getUserByEmail = async (req:Request , res:Response) => {
+   const {email} = req.body;
+   if(email){
+      try {
+         const user = await prisma.user.findUnique({
+          where:{
+            email
+          }
+         });
+         res.status(200).json(new ApiResponse(200 , user , "Successfully fetched user!"));
+      } catch (error) {
+        res.status(500).json(new ApiResponse(500, "Internal server error!"));
+      }
+   }else{
+    res.status(422).json(new ApiResponse(422 , "All fields are required"));
+   }
 }
 
 

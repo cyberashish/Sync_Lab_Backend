@@ -1,5 +1,5 @@
 import express from "express";
-import { addEmployee, addEmployeesRequest, createAdminNotification, createEmployeeNotification, deleteEmployee, editEmployee, employeeProfile, getAllAdminNotifications, getAllEmployeeNotifications, getAllEmployees, getAllEmployeesRequest, getEmployeeByEmail, getEmployeeRequestInfo, updateAdminNotification, updateEmployeeLeave, updateEmployeeNotification, updateEmployeeRequest } from "../../controllers/employee.controller.ts";
+import { addEmployee, addEmployeesOvertimeRequest, addEmployeesRequest, createAdminNotification, createEmployeeNotification, deleteEmployee, editEmployee, employeeProfile, getAllAdminNotifications, getAllEmployeeNotifications, getAllEmployees, getAllEmployeesOvertimeRequest, getAllEmployeesRequest, getEmployeeByEmail, getEmployeeOvertimeRequestInfo, getEmployeeRequestInfo, updateAdminNotification, updateEmployeeLeave, updateEmployeeNotification, updateEmployeeOvertime, updateEmployeeOvertimeRequest, updateEmployeeRequest } from "../../controllers/employee.controller.ts";
 
 const employeeRouter = express.Router();
 
@@ -21,5 +21,10 @@ employeeRouter
 .post("/add-notification" , createEmployeeNotification)
 .put("/update-notification" , updateEmployeeNotification)
 .get("/all-notifications" , getAllEmployeeNotifications)
+.post("/add-overtime-request" , addEmployeesOvertimeRequest)
+.post("/get-employee/overtime-requests" , getEmployeeOvertimeRequestInfo)
+.get("/all-overtime-requests" , getAllEmployeesOvertimeRequest)
+.put("/update-overtime-request" , updateEmployeeOvertimeRequest)
+.put("/update-employee-overtime" , updateEmployeeOvertime)
 
 export {employeeRouter}
