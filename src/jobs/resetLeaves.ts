@@ -2,7 +2,7 @@ import cron from "node-cron";
 import { prisma } from "../utils/client.ts";
 
 cron.schedule("0 0 1 1 *" , async () => {
-    console.log("Running Yearly rest leaves");
+    console.log("Running Yearly rest leaves of ems");
 
     try{
      const result =  await prisma.employee.updateMany({
