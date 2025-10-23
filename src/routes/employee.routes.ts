@@ -1,5 +1,5 @@
 import express from "express";
-import { addEmployee, addEmployeesOvertimeRequest, addEmployeesRequest, createAdminNotification, createEmployeeNotification, deleteEmployee, editEmployee, employeeProfile, getAllAdminNotifications, getAllEmployeeNotifications, getAllEmployees, getAllEmployeesOvertimeRequest, getAllEmployeesRequest, getEmployeeByEmail, getEmployeeOvertimeRequestInfo, getEmployeeRequestInfo, updateAdminNotification, updateEmployeeLeave, updateEmployeeNotification, updateEmployeeOvertime, updateEmployeeOvertimeRequest, updateEmployeeRequest } from "../../controllers/employee.controller.ts";
+import { addEmployee, addEmployeesOvertimeRequest, addEmployeesRequest, addLeaveChangeLog, createAdminNotification, createEmployeeNotification, deleteEmployee, editEmployee, employeeProfile, getAllAdminNotifications, getAllEmployeeNotifications, getAllEmployees, getAllEmployeesOvertimeRequest, getAllEmployeesRequest, getEmployeeByEmail, getEmployeeDetails, getEmployeeOvertimeRequestInfo, getEmployeeRequestInfo, updateAdminNotification, updateEmployeeLeave, updateEmployeeNotification, updateEmployeeOvertime, updateEmployeeOvertimeRequest, updateEmployeeRequest } from "../../controllers/employee.controller.ts";
 
 const employeeRouter = express.Router();
 
@@ -10,6 +10,7 @@ employeeRouter
 .get("/all", getAllEmployees)
 .post("/get-employee", getEmployeeByEmail)
 .delete("/delete-employee/:id" , deleteEmployee)
+.get("/employee-detail/:id" , getEmployeeDetails)
 .post("/add-request" , addEmployeesRequest)
 .post("/get-employee/requests" , getEmployeeRequestInfo)
 .get("/all-requests" , getAllEmployeesRequest)
@@ -26,5 +27,6 @@ employeeRouter
 .get("/all-overtime-requests" , getAllEmployeesOvertimeRequest)
 .put("/update-overtime-request" , updateEmployeeOvertimeRequest)
 .put("/update-employee-overtime" , updateEmployeeOvertime)
+.post("/add-leave-changelog" , addLeaveChangeLog)
 
 export {employeeRouter}

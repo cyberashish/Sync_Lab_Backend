@@ -63,8 +63,10 @@ model Employee {
     casualLeaves         Float? @default(0)
     vacationLeaves       Float? @default(0)
     overtimeDays         Float? @default(0)
+    bondType             String?
     requests             Request[]
     overtimes            Overtime[]
+    leaveChangeLogs      LeaveChangeLog[]
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
 }
@@ -103,4 +105,13 @@ model Overtime {
   updatedAt          DateTime @updatedAt
 }
 
+model LeaveChangeLog {
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId         String
+  oldLeaves          Float
+  newLeaves          Float
+  employee           Employee @relation(fields:[employeeId] , references:[id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
 
