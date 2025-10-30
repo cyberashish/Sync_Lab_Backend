@@ -26,7 +26,8 @@ export const addEmployee = async (req: Request, res: Response) => {
       employeeDOBDate,
       employeeJoiningDate,
       allottedLeaves,
-      bondType
+      bondType,
+      imageUrl
     } = req.body;
 
     if (
@@ -45,7 +46,8 @@ export const addEmployee = async (req: Request, res: Response) => {
       employeeDOBDate &&
       employeeJoiningDate &&
       allottedLeaves&&
-      bondType
+      bondType&&
+      imageUrl
     ) {
       const password = generateSimplePassword(name, email);
       const salt = await genSalt(10);
@@ -73,7 +75,8 @@ export const addEmployee = async (req: Request, res: Response) => {
           employeeDOBDate,
           employeeJoiningDate,
           employeePassword: password,
-          bondType
+          bondType,
+          imageUrl
         },
       });
       res
@@ -874,4 +877,76 @@ export const getEmployeeDetails = async (req:Request , res:Response) => {
       }catch(error){
         res.status(500).json(new ApiResponse(500 , "Internal Server error!"));
       }
+}
+
+
+export const addHoliday = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      name,
+      description,
+      holidayDates,
+      totalDays,
+      type
+    } = req.body;
+    if (
+      name &&
+      description && 
+      holidayDates &&
+      totalDays &&
+      type
+    ) {
+      const request = await prisma.holiday.create({
+        data: {
+          name ,
+          description,
+          holidayDates,
+          totalDays,
+          type
+        },
+      });
+      res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            request,
+            "Successfully created holiday!"
+          )
+        );
+    } else {
+      res
+        .status(422)
+        .json(new ApiError(422, "Please provide all valid fields!"));
+    }
+  } catch (error) {
+    res.status(500).json(new ApiError(500, error.message));
+  }
+};
+
+export const getAllHoliday = async (req:Request , res:Response) => {
+     try{
+        const allHolidays = await prisma.holiday.findMany({
+          orderBy: { createdAt: "desc" },
+        });
+        res.status(200).json(new ApiResponse(200, allHolidays , "Successfully fetched all holidays!"));
+     }catch(error){
+      res.status(500).json(new ApiResponse(500 , "Internal Server error!"));
+     }
+}
+
+export const deleteHoliday = async (req:Request , res:Response) => {
+    if(req.params.id){
+       const deletedHoliday = await prisma.holiday.delete({
+        where:{
+          id:req.params.id
+        }
+       });
+       res.status(200).json(new ApiResponse(200, deletedHoliday , "Successfully deleted holiday!"));
+    }else{
+      res.status(422).json(new ApiResponse(422 , "Failed to get holiday Id!"))
+    }
 }

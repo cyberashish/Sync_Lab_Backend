@@ -1,5 +1,5 @@
 import express from "express";
-import { addEmployee, addEmployeesOvertimeRequest, addEmployeesRequest, addLeaveChangeLog, createAdminNotification, createEmployeeNotification, deleteEmployee, editEmployee, employeeProfile, getAllAdminNotifications, getAllEmployeeNotifications, getAllEmployees, getAllEmployeesOvertimeRequest, getAllEmployeesRequest, getEmployeeByEmail, getEmployeeDetails, getEmployeeOvertimeRequestInfo, getEmployeeRequestInfo, updateAdminNotification, updateEmployeeLeave, updateEmployeeNotification, updateEmployeeOvertime, updateEmployeeOvertimeRequest, updateEmployeeRequest } from "../../controllers/employee.controller.ts";
+import { addEmployee, addEmployeesOvertimeRequest, addEmployeesRequest, addHoliday, addLeaveChangeLog, createAdminNotification, createEmployeeNotification, deleteEmployee, deleteHoliday, editEmployee, employeeProfile, getAllAdminNotifications, getAllEmployeeNotifications, getAllEmployees, getAllEmployeesOvertimeRequest, getAllEmployeesRequest, getAllHoliday, getEmployeeByEmail, getEmployeeDetails, getEmployeeOvertimeRequestInfo, getEmployeeRequestInfo, updateAdminNotification, updateEmployeeLeave, updateEmployeeNotification, updateEmployeeOvertime, updateEmployeeOvertimeRequest, updateEmployeeRequest } from "../../controllers/employee.controller.ts";
 
 const employeeRouter = express.Router();
 
@@ -28,5 +28,8 @@ employeeRouter
 .put("/update-overtime-request" , updateEmployeeOvertimeRequest)
 .put("/update-employee-overtime" , updateEmployeeOvertime)
 .post("/add-leave-changelog" , addLeaveChangeLog)
+.post("/add-holiday" , addHoliday)
+.get("/all-holiday" , getAllHoliday)
+.delete("/delete-holiday/:id" , deleteHoliday)
 
 export {employeeRouter}
